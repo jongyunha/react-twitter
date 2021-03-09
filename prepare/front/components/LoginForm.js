@@ -1,32 +1,39 @@
 import React, { useCallback } from 'react';
-import PropTypes from 'prop-types';
 import { Form, Input, Button } from 'antd';
 import Link from 'next/link';
 import styled from 'styled-components';
+import { useDispatch, useSelector } from 'react-redux';
+
+import { loginRequestAction } from '../reducers/user';
 import useInput from '../hooks/useInput';
 
 const ButtonWrapper = styled.div`
   margin-top: 10px;
 `;
 
-const FormWrapper = styled(Form)``;
+const FormWrapper = styled(Form)`
+  padding: 10px;
+`;
 
-const LoginForm = ({ setIsLoggedIn }) => {
+const LoginForm = () => {
+  const { logInLoading } = useSelector((state) => state.user);
+  const dispatch = useDispatch();
   // Form 에서는 반복되는 부분이 많아서 custom hook 을 쓰면 좋아요
-  const [id, onChangeId] = useInput('');
+  const [email, onChangeEmail] = useInput('');
   const [password, onChangePassword] = useInput('');
 
   const onSubmitForm = useCallback(() => {
-    console.log(id, password);
-    setIsLoggedIn(true);
-  }, [id, password]);
+    console.log(email, password);
+    // reducers 폴더에서 user.js 의 action create 참조
+    dispatch(loginRequestAction({ email, password }));
+  }, [email, password]);
 
   return (
     <FormWrapper onFinish={onSubmitForm}>
       <div>
-        <label htmlFor="user-id">아이디</label>
+        <label htmlFor="user-id">이메일</label>
         <br />
-        <Input name="user-id" value={id} onChange={onChangeId} required />
+        <Input name="user-id" value={email} onChange={onChangeEmail} required />
       </div>
       <div>
         <label htmlFor="user-password">비밀번호</label>
@@ -40,7 +47,7 @@ const LoginForm = ({ setIsLoggedIn }) => {
         />
       </div>
       <ButtonWrapper>
-        <Button type="primary" htmlType="submit" loading={false}>
+        <Button type="primary" htmlType="submit" loading={logInLoading}>
           로그인
         </Button>
         <Link href="/signup">
@@ -51,10 +58,6 @@ const LoginForm = ({ setIsLoggedIn }) => {
       </ButtonWrapper>
     </FormWrapper>
   );
-};
-
-LoginForm.propTypes = {
-  setIsLoggedIn: PropTypes.func.isRequired,
 };
 
 export default LoginForm;

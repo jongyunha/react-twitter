@@ -1,20 +1,38 @@
-import React, { useState } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import Link from 'next/link';
 import { Menu, Input, Row, Col } from 'antd';
 import styled from 'styled-components';
+// npm i react-redux
+import { useSelector } from 'react-redux';
+import { createGlobalStyle } from 'styled-components';
 
 import UserProfile from '../components/UserProfile';
 import LoginForm from '../components/LoginForm';
+
+const Global = createGlobalStyle`
+	.ant-row {
+		margin-right: 0 !important;
+		margin-right: 0 !important;
+	}
+	.ant-col:first-child {
+		padding-left: 0 !important;
+	}
+	.ant-col:last-child {
+		padding-right: 0 !important;
+	}
+`;
 
 const SearchInput = styled(Input.Search)`
   vertical-align: middle;
 `;
 
 const AppLayout = ({ children }) => {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  // isLoggedIn 의 상태가 바뀌면 알아서 리렌더링 됩니다.
+  const { me } = useSelector((state) => state.user);
   return (
     <div>
+      <Global />
       <Menu mode="horizontal">
         <Menu.Item>
           <Link href="/">Home</Link>
@@ -31,11 +49,7 @@ const AppLayout = ({ children }) => {
       </Menu>
       <Row gutter={8}>
         <Col xs={24} md={6}>
-          {isLoggedIn ? (
-            <UserProfile setIsLoggedIn={setIsLoggedIn} />
-          ) : (
-            <LoginForm setIsLoggedIn={setIsLoggedIn} />
-          )}
+          {me ? <UserProfile /> : <LoginForm />}
         </Col>
         <Col xs={24} md={12}>
           {children}

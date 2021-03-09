@@ -8,5 +8,5 @@ export default (initalValue = null) => {
     setValue(e.target.value);
   }, []);
   // return 에 setValue 대신 useState와 useCallback 합쳤기 때문에 이 2개를 return
-  return [value, handler];
+  return [value, handler, setValue];
 };
