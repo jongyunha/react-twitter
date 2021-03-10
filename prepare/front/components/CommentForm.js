@@ -9,11 +9,11 @@ const CommentForm = ({ post }) => {
   const id = useSelector((state) => state.user.me?.id);
   const { addCommentDone } = useSelector((state) => state.post);
   const dispatch = useDispatch();
-  const [commentText, onChangeCommentText] = useInput('');
+  const [commentText, onChangeCommentText, setCommentText] = useInput('');
 
   useEffect(() => {
     if (addCommentDone) {
-      onChangeCommentText('');
+      setCommentText('');
     }
   }, [addCommentDone]);
 

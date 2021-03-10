@@ -1,13 +1,14 @@
-import React, { useCallback, useState, useRef, useEffect } from 'react';
+import React, { useCallback, useRef, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Button, Form, Input } from 'antd';
+
 import { addPost } from '../reducers/post';
+import useInput from '../hooks/useInput';
 
 const PostForm = () => {
   const { imagePaths, addPostDone } = useSelector((state) => state.post);
   const dispatch = useDispatch();
-  const [text, setText] = useState('');
-  const imageInput = useRef();
+  const [text, onChangeText, setText] = useInput('');
 
   useEffect(() => {
     if (addPostDone) {
@@ -17,9 +18,8 @@ const PostForm = () => {
   const onSubmit = useCallback(() => {
     dispatch(addPost(text));
   }, [text]);
-  const onChangeText = useCallback((e) => {
-    setText(e.target.value);
-  }, []);
+
+  const imageInput = useRef();
   const onClickImageUpload = useCallback(() => {
     // input type이 파일인경우 ref 를 사용해 직접 Dom에 접근한 후 current.click()
     imageInput.current.click();
