@@ -1,7 +1,7 @@
-import { Button, Popover } from 'antd';
+import { Button, Popover, Card, List, Comment } from 'antd';
 import React, { useState, useCallback } from 'react';
 import PropTypes from 'prop-types';
-import { Card, List, Comment } from 'antd';
+
 import {
   RetweetOutlined,
   HeartOutlined,
@@ -9,15 +9,18 @@ import {
   EllipsisOutlined,
   HeartTwoTone,
 } from '@ant-design/icons';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import Avatar from 'antd/lib/avatar/avatar';
 
 import PostImages from './PostImages';
 import CommentForm from './CommentForm';
 import PostCardContent from './PostCardContent';
+import { REMOVE_POST_REQUEST } from '../reducers/post';
 
 const PostCard = ({ post }) => {
+  const dispatch = useDispatch();
   const { me } = useSelector((state) => state.user);
+  const { removePostLoading } = useSelector((state) => state.post);
   const [liked, setLiked] = useState(false);
   const [commentFormOpened, setCommentFormOpened] = useState(false);
 
@@ -27,7 +30,15 @@ const PostCard = ({ post }) => {
   const onToggleComment = useCallback(() => {
     setCommentFormOpened((prev) => !prev);
   }, [commentFormOpened]);
-
+  const onRemovePost = useCallback(() => {
+    dispatch({
+      type: REMOVE_POST_REQUEST,
+      data: post.id,
+    });
+  }, []);
+  const onCheckState = useCallback(() => {
+    console.log(me.Posts);
+  });
   // const id = me ? me.id : undefined;
   const id = me?.id;
   // {/* 배열안에 JSX를 넣을땐 항상 key 값을 줘야합니다.*/}
@@ -51,10 +62,16 @@ const PostCard = ({ post }) => {
             key="more"
             content={
               <Button.Group>
-                {id && post.id === id ? (
+                {id && post.User.id === id ? (
                   <>
-                    <Button>수정</Button>
-                    <Button type="danger">삭제</Button>s
+                    <Button onClick={onCheckState}>수정</Button>
+                    <Button
+                      type="danger"
+                      onClick={onRemovePost}
+                      loading={removePostLoading}
+                    >
+                      삭제
+                    </Button>
                   </>
                 ) : (
                   <Button>신고</Button>

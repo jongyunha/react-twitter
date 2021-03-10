@@ -1,14 +1,17 @@
+import { Button, Form, Input } from 'antd';
 import React, { useCallback, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import { Form, Input, Button } from 'antd';
-import useInput from '../hooks/useInput';
 import { useDispatch, useSelector } from 'react-redux';
+
+import useInput from '../hooks/useInput';
 import { ADD_COMMENT_REQUEST } from '../reducers/post';
 
 const CommentForm = ({ post }) => {
-  const id = useSelector((state) => state.user.me?.id);
-  const { addCommentDone } = useSelector((state) => state.post);
   const dispatch = useDispatch();
+  const { addCommentDone, addCommentLoading } = useSelector(
+    (state) => state.post,
+  );
+  const id = useSelector((state) => state.user.me?.id);
   const [commentText, onChangeCommentText, setCommentText] = useInput('');
 
   useEffect(() => {
@@ -18,24 +21,25 @@ const CommentForm = ({ post }) => {
   }, [addCommentDone]);
 
   const onSubmitComment = useCallback(() => {
-    console.log(post.id, commentText);
     dispatch({
       type: ADD_COMMENT_REQUEST,
-      data: { content: commentText, postId: post.id, userID: id },
+      data: { content: commentText, userId: id, postId: post.id },
     });
-  }, [commentText]);
+  }, [commentText, id]);
+
   return (
     <Form onFinish={onSubmitComment}>
       <Form.Item style={{ position: 'relative', margin: 0 }}>
         <Input.TextArea
+          rows={4}
           value={commentText}
           onChange={onChangeCommentText}
-          rows={4}
         />
         <Button
-          style={{ position: 'absolute', right: 0, bottom: -40 }}
+          style={{ position: 'absolute', right: 0, bottom: -40, zIndex: 1 }}
           type="primary"
           htmlType="submit"
+          loading={addCommentLoading}
         >
           댓글달기
         </Button>
@@ -45,15 +49,7 @@ const CommentForm = ({ post }) => {
 };
 
 CommentForm.propTypes = {
-  post: PropTypes.shape({
-    id: PropTypes.number,
-    User: PropTypes.object,
-    content: PropTypes.string,
-    Images: PropTypes.array,
-    Comments: PropTypes.arrayOf(PropTypes.object),
-    imagePaths: PropTypes.arrayOf(PropTypes.object),
-    postAdded: PropTypes.bool,
-  }).isRequired,
+  post: PropTypes.object.isRequired,
 };
 
 export default CommentForm;

@@ -1,3 +1,5 @@
+import { ADD_POST_TO_ME, REMOVE_POST_OF_ME } from './post';
+
 export const initalState = {
   logInLoading: false, // 로그인 시도중
   logInDone: false,
@@ -8,6 +10,9 @@ export const initalState = {
   signUpLoading: false, // 회원가입 시도중
   signUpDone: false,
   signUpError: false,
+  ChangeNickNameLoading: false, // 닉네임 변경 시도중
+  ChangeNickNameDone: false,
+  ChangeNickNameError: false,
   me: null,
   signUpData: {},
   loginData: {},
@@ -25,6 +30,10 @@ export const SIGN_UP_REQUEST = 'SIGN_UP_REQUEST';
 export const SIGN_UP_SUCCESS = 'SIGN_UP_SUCCESS';
 export const SIGN_UP_FAILURE = 'SIGN_UP_FAILURE';
 
+export const CHANGE_NICKNAME_REQUEST = 'CHANGE_NICKNAME_REQUEST';
+export const CHANGE_NICKNAME_SUCCESS = 'CHANGE_NICKNAME_SUCCESS';
+export const CHANGE_NICKNAME_FAILURE = 'CHANGE_NICKNAME_FAILURE';
+
 export const FOLLOW_REQUEST = 'FOLLOW_REQUEST';
 export const FOLLOW_SUCCESS = 'FOLLOW_SUCCESS';
 export const FOLLOW_FAILURE = 'FOLLOW_FAILURE';
@@ -33,13 +42,21 @@ export const UNFOLLOW_REQUEST = 'UNFOLLOW_REQUEST';
 export const UNFOLLOW_SUCCESS = 'UNFOLLOW_SUCCESS';
 export const UNFOLLOW_FAILURE = 'UNFOLLOW_FAILURE';
 
-const dummyUser = (action) => ({
-  ...action.data,
+const dummyUser = (data) => ({
+  ...data,
   nickname: '하종윤',
   id: 1,
-  Posts: [],
-  Followings: [],
-  Followers: [],
+  Posts: [{ id: 1 }],
+  Followings: [
+    { nickname: '최태훈' },
+    { nickname: '황수철' },
+    { nickname: '김기량' },
+  ],
+  Followers: [
+    { nickname: '최태훈' },
+    { nickname: '황수철' },
+    { nickname: '김기량' },
+  ],
 });
 
 // 이것의 redux-thunk 전부 입니다. redux-thunk 를 사용하는 이유는 한번에 여러번의 dispatch 를 하기 위해서
@@ -60,23 +77,18 @@ const dummyUser = (action) => ({
 // };
 
 // action creater
-export const loginRequestAction = (data) => {
-  return {
-    type: LOG_IN_REQUEST,
-    data,
-  };
-};
+export const loginRequestAction = (data) => ({
+  type: LOG_IN_REQUEST,
+  data,
+});
 
-export const logoutRequestAction = () => {
-  return {
-    type: LOG_OUT_REQUEST,
-  };
-};
+export const logoutRequestAction = () => ({
+  type: LOG_OUT_REQUEST,
+});
 
 const reducer = (state = initalState, action) => {
   switch (action.type) {
     case LOG_IN_REQUEST:
-      console.log('11');
       return {
         ...state,
         logInLoading: true,
@@ -135,6 +147,42 @@ const reducer = (state = initalState, action) => {
         signUpLoading: false,
         signUpError: action.error,
       };
+    case CHANGE_NICKNAME_REQUEST:
+      return {
+        ...state,
+        ChangeNickNameLoading: true,
+        ChangeNickNameDone: false,
+        ChangeNickNameError: null,
+      };
+    case CHANGE_NICKNAME_SUCCESS:
+      return {
+        ...state,
+        ChangeNickNameLoading: false,
+        ChangeNickNameDone: true,
+      };
+    case CHANGE_NICKNAME_FAILURE:
+      return {
+        ...state,
+        ChangeNickNameLoading: false,
+        ChangeNickNameError: action.error,
+      };
+    case ADD_POST_TO_ME:
+      return {
+        ...state,
+        me: {
+          ...state.me,
+          Posts: [{ id: action.data }, ...state.me.Posts],
+        },
+      };
+    case REMOVE_POST_OF_ME:
+      return {
+        ...state,
+        me: {
+          ...state.me,
+          Posts: state.me.Posts.filter((v) => v.id !== action.data),
+        },
+      };
+
     default:
       return state;
   }

@@ -30,7 +30,6 @@ function* logIn(action) {
     // 보통이 함수 호출은 logInApi(action.data) 이렇게 하지마 call 이나 fork 를 사용할때는 이렇게 펼쳐줘야 합니다.
     // const result = yield call(logInApi, action.data);
     yield delay(1000);
-    console.log(action.data);
     yield put({
       type: LOG_IN_SUCCESS,
       data: action.data,

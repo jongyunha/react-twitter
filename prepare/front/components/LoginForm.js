@@ -16,24 +16,28 @@ const FormWrapper = styled(Form)`
 `;
 
 const LoginForm = () => {
-  const { logInLoading } = useSelector((state) => state.user);
+  const { logInLoading, me } = useSelector((state) => state.user);
   const dispatch = useDispatch();
   // Form 에서는 반복되는 부분이 많아서 custom hook 을 쓰면 좋아요
   const [email, onChangeEmail] = useInput('');
   const [password, onChangePassword] = useInput('');
 
   const onSubmitForm = useCallback(() => {
-    console.log(email, password);
     // reducers 폴더에서 user.js 의 action create 참조
     dispatch(loginRequestAction({ email, password }));
   }, [email, password]);
-
   return (
     <FormWrapper onFinish={onSubmitForm}>
       <div>
         <label htmlFor="user-id">이메일</label>
         <br />
-        <Input name="user-id" value={email} onChange={onChangeEmail} required />
+        <Input
+          name="user-id"
+          type="email"
+          value={email}
+          onChange={onChangeEmail}
+          required
+        />
       </div>
       <div>
         <label htmlFor="user-password">비밀번호</label>
