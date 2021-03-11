@@ -1,6 +1,7 @@
 // reduce or data 의 움직임이 1순위 화면은 그 데이터 또는 액션을 기반으로 맞춰나가는것
 
 import shortid from 'shortid';
+import produce from 'immer';
 
 export const initalState = {
   mainPosts: [
@@ -105,85 +106,77 @@ const dummyComments = (data) => ({
   },
 });
 
-const reducer = (state = initalState, action) => {
-  switch (action.type) {
-    case ADD_POST_REQUEST:
-      return {
-        ...state,
-        addPostLoading: true,
-        addPostDone: false,
-        addPostError: null,
-      };
-    case ADD_POST_SUCCESS:
-      return {
-        ...state,
+// 이전 상태를 액션을 통해 다음 상태로 만들어내는 함수
+const reducer = (state = initalState, action) =>
+  produce(state, (draft) => {
+    switch (action.type) {
+      case ADD_POST_REQUEST:
+        draft.addPostLoading = true;
+        draft.addPostDone = false;
+        draft.addPostError = null;
+        break;
+      case ADD_POST_SUCCESS:
+        draft.addPostLoading = false;
+        draft.addPostDone = true;
+        draft.addPostError = null;
         // 앞에다가 추가를 해주는 이유는
         // 새로운 게시글이 제일 상단에 뜨게하기 위해서
-        mainPosts: [dummyPost(action.data), ...state.mainPosts],
-        addPostLoading: false,
-        addPostDone: true,
-        addPostError: null,
-      };
-    case ADD_POST_FAILURE:
-      return {
-        ...state,
-        addPostLoading: false,
-        addPostError: action.error,
-      };
-    case REMOVE_POST_REQUEST:
-      return {
-        ...state,
-        removePostLoading: true,
-        removePostDone: false,
-        removePostError: null,
-      };
-    case REMOVE_POST_SUCCESS:
-      return {
-        ...state,
-        removePostLoading: false,
-        removePostDone: true,
-        mainPosts: state.mainPosts.filter((v) => v.id !== action.data),
-      };
-    case REMOVE_POST_FAILURE:
-      return {
-        ...state,
-        removePostLoading: false,
-        removePostError: action.error,
-      };
-    case ADD_COMMENT_REQUEST:
-      return {
-        ...state,
-        addCommentLoading: true,
-        addCommentDone: false,
-        addCommentError: null,
-      };
-    case ADD_COMMENT_SUCCESS: {
-      // 댓글을 달았을대 어떤 게시물에 댓글을 달았는지 게시물의 index 값을 찾아내기 위해서
-      const postIndex = state.mainPosts.findIndex(
-        (v) => v.id === action.data.postId,
-      );
-      const post = { ...state.mainPosts[postIndex] };
-      post.Comments = [dummyComments(action.data.content), ...post.Comments];
-      const mainPosts = [...state.mainPosts];
-      mainPosts[postIndex] = post;
-
-      return {
-        ...state,
-        mainPosts,
-        addCommentLoading: false,
-        addCommentDone: true,
-        addCommentError: false,
-      };
+        // draft.mainPosts = [dummyPost(action.data), ...state.mainPosts];
+        // immer 도입후
+        draft.mainPosts.unshift(dummyPost(action.data));
+        break;
+      case ADD_POST_FAILURE:
+        draft.addPostLoading = false;
+        draft.addPostError = action.error;
+        break;
+      case REMOVE_POST_REQUEST:
+        draft.removePostLoading = true;
+        draft.removePostDone = false;
+        draft.removePostError = null;
+        break;
+      case REMOVE_POST_SUCCESS:
+        draft.removePostLoading = false;
+        draft.removePostDone = true;
+        draft.mainPosts = draft.mainPosts.filter((v) => v.id !== action.data);
+        break;
+      case REMOVE_POST_FAILURE:
+        draft.removePostLoading = false;
+        draft.removePostError = action.error;
+        break;
+      case ADD_COMMENT_REQUEST:
+        draft.addCommentLoading = true;
+        draft.addPostDone = false;
+        draft.addCommentError = null;
+        break;
+      case ADD_COMMENT_SUCCESS: {
+        // const post = { ...state.mainPosts[postIndex] };
+        // post.Comments = [dummyComments(action.data.content), ...post.Comments];
+        // const mainPosts = [...state.mainPosts];
+        // mainPosts[postIndex] = post;
+        //
+        // return {
+        //   ...state,
+        //   mainPosts,
+        //   addCommentLoading: false,
+        //   addCommentDone: true,
+        //   addCommentError: false,
+        // };
+        // 댓글을 달았을대 어떤 게시물에 댓글을 달았는지 게시물의 index 값을 찾아내기 위해서
+        const post = draft.mainPosts.find((v) => v.id === action.data.postId);
+        post.Comments.unshift(dummyComments(action.data.content));
+        draft.addCommentLoading = false;
+        draft.addCommentDone = true;
+        draft.addCommentError = false;
+        break;
+      }
+      case ADD_COMMENT_FAILURE:
+        draft.addCommentLoading = true;
+        draft.addCommentError = action.error;
+        draft.addPostDone = false;
+        break;
+      default:
+        break;
     }
-    case ADD_COMMENT_FAILURE:
-      return {
-        addCommentLoading: false,
-        addCommentDone: false,
-        addCommentError: action.error,
-      };
-    default:
-      return state;
-  }
-};
+  });
 
 export default reducer;
