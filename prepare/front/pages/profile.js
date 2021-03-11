@@ -1,15 +1,24 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import Head from 'next/head';
+import { useSelector } from 'react-redux';
+import Router from 'next/router';
 import AppLayout from '../components/AppLayout';
 import NicknameEditForm from '../components/NicknameEditForm';
 import FollowList from '../components/FollowList';
-import { useSelector } from 'react-redux';
 
 const Profile = () => {
   // 더미데이터로 테스트하기
   // 하나의 배열 객체가 하나의 Item 입니다.
 
   const { me } = useSelector((state) => state.user);
+  useEffect(() => {
+    if (!(me && me.id)) {
+      Router.push('/');
+    }
+  }, [me && me.id]);
+  if (!me) {
+    return null;
+  }
   return (
     <>
       <Head>

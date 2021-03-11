@@ -84,6 +84,8 @@ function* addComment(action) {
       data: action.data,
     });
   } catch (err) {
+    console.log('Error 출력');
+    console.error(err);
     yield put({
       type: ADD_COMMENT_FAILURE,
       error: action.error,

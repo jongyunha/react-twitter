@@ -1,7 +1,8 @@
 // reduce or data 의 움직임이 1순위 화면은 그 데이터 또는 액션을 기반으로 맞춰나가는것
 
-import shortid from 'shortid';
+import shortId from 'shortid';
 import produce from 'immer';
+import faker from 'faker';
 
 export const initalState = {
   mainPosts: [
@@ -28,7 +29,7 @@ export const initalState = {
       ],
       Comments: [
         {
-          id: shortid.generate(),
+          id: shortId.generate(),
           User: {
             nickname: 'redux',
           },
@@ -36,7 +37,7 @@ export const initalState = {
         },
         {
           User: {
-            id: shortid.generate(),
+            id: shortId.generate(),
             nickname: 'react',
           },
           content: 'react todo study',
@@ -55,6 +56,29 @@ export const initalState = {
   removePostDone: false,
   removePostError: null,
 };
+
+initalState.mainPosts = initalState.mainPosts.concat(
+  Array(20)
+    .fill()
+    .map(() => ({
+      id: shortId.generate(),
+      User: {
+        id: shortId.generate(),
+        nickname: faker.name.findName(),
+      },
+      content: faker.lorem.paragraph(),
+      Images: [{ src: faker.image.image() }, { src: faker.image.image() }],
+      Comments: [
+        {
+          User: {
+            id: shortId.generate(),
+            nickname: faker.name.findName(),
+          },
+          content: faker.lorem.sentence(),
+        },
+      ],
+    })),
+);
 
 export const ADD_POST_REQUEST = 'ADD_POST_REQUEST';
 export const ADD_POST_SUCCESS = 'ADD_POST_SUCCESS';
@@ -98,7 +122,7 @@ const dummyPost = (data) => ({
 });
 
 const dummyComments = (data) => ({
-  id: shortid.generate(),
+  id: shortId.generate(),
   content: data,
   User: {
     id: 1,
@@ -148,7 +172,7 @@ const reducer = (state = initalState, action) =>
         draft.addPostDone = false;
         draft.addCommentError = null;
         break;
-      case ADD_COMMENT_SUCCESS: {
+      case ADD_COMMENT_SUCCESS:
         // const post = { ...state.mainPosts[postIndex] };
         // post.Comments = [dummyComments(action.data.content), ...post.Comments];
         // const mainPosts = [...state.mainPosts];
@@ -162,15 +186,16 @@ const reducer = (state = initalState, action) =>
         //   addCommentError: false,
         // };
         // 댓글을 달았을대 어떤 게시물에 댓글을 달았는지 게시물의 index 값을 찾아내기 위해서
-        const post = draft.mainPosts.find((v) => v.id === action.data.postId);
-        post.Comments.unshift(dummyComments(action.data.content));
-        draft.addCommentLoading = false;
-        draft.addCommentDone = true;
-        draft.addCommentError = false;
+        {
+          const post = draft.mainPosts.find((v) => v.id === action.data.postId);
+          post.Comments.unshift(dummyComments(action.data.content));
+          draft.addCommentLoading = false;
+          draft.addCommentDone = true;
+          console.log('왜 ?!!');
+        }
         break;
-      }
       case ADD_COMMENT_FAILURE:
-        draft.addCommentLoading = true;
+        draft.addCommentLoading = false;
         draft.addCommentError = action.error;
         draft.addPostDone = false;
         break;
