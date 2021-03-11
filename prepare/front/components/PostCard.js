@@ -9,13 +9,15 @@ import {
   EllipsisOutlined,
   HeartTwoTone,
 } from '@ant-design/icons';
+
 import { useDispatch, useSelector } from 'react-redux';
 import Avatar from 'antd/lib/avatar/avatar';
+import { REMOVE_POST_REQUEST } from '../reducers/post';
 
 import PostImages from './PostImages';
 import CommentForm from './CommentForm';
 import PostCardContent from './PostCardContent';
-import { REMOVE_POST_REQUEST } from '../reducers/post';
+import FollowButton from './FollowButton';
 
 const PostCard = ({ post }) => {
   const dispatch = useDispatch();
@@ -36,9 +38,6 @@ const PostCard = ({ post }) => {
       data: post.id,
     });
   }, []);
-  const onCheckState = useCallback(() => {
-    console.log(me.Posts);
-  });
   // const id = me ? me.id : undefined;
   const id = me?.id;
   // {/* 배열안에 JSX를 넣을땐 항상 key 값을 줘야합니다.*/}
@@ -64,7 +63,7 @@ const PostCard = ({ post }) => {
               <Button.Group>
                 {id && post.User.id === id ? (
                   <>
-                    <Button onClick={onCheckState}>수정</Button>
+                    <Button>수정</Button>
                     <Button
                       type="danger"
                       onClick={onRemovePost}
@@ -82,6 +81,7 @@ const PostCard = ({ post }) => {
             <EllipsisOutlined />
           </Popover>,
         ]}
+        extra={id && <FollowButton post={post} />}
       >
         <Card.Meta
           avatar={<Avatar>{post.User.nickname[0]}</Avatar>}

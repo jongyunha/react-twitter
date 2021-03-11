@@ -11,7 +11,51 @@ import {
   SIGN_UP_REQUEST,
   SIGN_UP_SUCCESS,
   SIGN_UP_FAILURE,
+  FOLLOW_REQUEST,
+  UNFOLLOW_REQUEST,
+  FOLLOW_FAILURE,
+  FOLLOW_SUCCESS,
+  UNFOLLOW_SUCCESS,
+  UNFOLLOW_FAILURE,
 } from '../reducers/user';
+
+function followApi(data) {
+  return axios.post('api/follow', data);
+}
+
+function* follow(action) {
+  try {
+    yield delay(1000);
+    yield put({
+      type: FOLLOW_SUCCESS,
+      data: action.data,
+    });
+  } catch (error) {
+    yield put({
+      type: FOLLOW_FAILURE,
+      data: error,
+    });
+  }
+}
+
+function unfollowApi(data) {
+  return axios.post('api/unfollow', data);
+}
+
+function* unfollow(action) {
+  try {
+    yield delay(1000);
+    yield put({
+      type: UNFOLLOW_SUCCESS,
+      data: action.data,
+    });
+  } catch (error) {
+    yield put({
+      type: UNFOLLOW_FAILURE,
+      data: error,
+    });
+  }
+}
 
 function logInApi(data) {
   return axios.post('api/login', data);
@@ -111,6 +155,20 @@ function* watchSignUp() {
   yield takeLatest(SIGN_UP_REQUEST, signUp);
 }
 
+function* watchFollow() {
+  yield takeLatest(FOLLOW_REQUEST, follow);
+}
+
+function* watchUnFollow() {
+  yield takeLatest(UNFOLLOW_REQUEST, unfollow);
+}
+
 export default function* userSage() {
-  yield all([fork(watchLogin), fork(watchLogOut), fork(watchSignUp)]);
+  yield all([
+    fork(watchLogin),
+    fork(watchLogOut),
+    fork(watchSignUp),
+    fork(watchFollow),
+    fork(watchUnFollow),
+  ]);
 }
