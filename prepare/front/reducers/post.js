@@ -5,47 +5,12 @@ import produce from 'immer';
 import faker from 'faker';
 
 export const initalState = {
-  mainPosts: [
-    {
-      id: 1,
-      User: {
-        id: 1,
-        nickname: '하종윤',
-      },
-      content: '첫번째 게시글 #해시태그 #익스프레스',
-      Images: [
-        {
-          src:
-            'https://images.velog.io/images/printver_2world/post/88a7e9ea-a682-4497-93cc-70e1e89b9f5e/react_2.jpg',
-        },
-        {
-          src:
-            'https://cdn-images-1.medium.com/max/1200/1*VeM-5lsAtrrJ4jXH96h5kg.png',
-        },
-        {
-          src:
-            'https://www.baptiste-donaux.fr/react-redux-concept/react-redux.png',
-        },
-      ],
-      Comments: [
-        {
-          id: shortId.generate(),
-          User: {
-            nickname: 'redux',
-          },
-          content: 'redux todo study',
-        },
-        {
-          User: {
-            id: shortId.generate(),
-            nickname: 'react',
-          },
-          content: 'react todo study',
-        },
-      ],
-    },
-  ],
+  mainPosts: [],
   imagePaths: [],
+  hasMorePost: true,
+  loadPostLoading: false,
+  loadPostDone: false,
+  loadPostError: null,
   addPostLoading: false,
   addPostDone: false,
   addPostError: null,
@@ -57,8 +22,8 @@ export const initalState = {
   removePostError: null,
 };
 
-initalState.mainPosts = initalState.mainPosts.concat(
-  Array(20)
+export const generateDummyPost = (number) =>
+  Array(number)
     .fill()
     .map(() => ({
       id: shortId.generate(),
@@ -67,7 +32,7 @@ initalState.mainPosts = initalState.mainPosts.concat(
         nickname: faker.name.findName(),
       },
       content: faker.lorem.paragraph(),
-      Images: [{ src: faker.image.image() }, { src: faker.image.image() }],
+      Images: [{ src: faker.image.image() }],
       Comments: [
         {
           User: {
@@ -77,8 +42,13 @@ initalState.mainPosts = initalState.mainPosts.concat(
           content: faker.lorem.sentence(),
         },
       ],
-    })),
-);
+    }));
+
+// initalState.mainPosts = initalState.mainPosts.concat(generateDummyPost(10));
+
+export const LOAD_POST_REQUEST = 'LOAD_POST_REQUEST';
+export const LOAD_POST_SUCCESS = 'LOAD_POST_SUCCESS';
+export const LOAD_POST_FAILURE = 'LOAD_POST_FAILURE';
 
 export const ADD_POST_REQUEST = 'ADD_POST_REQUEST';
 export const ADD_POST_SUCCESS = 'ADD_POST_SUCCESS';
@@ -134,6 +104,22 @@ const dummyComments = (data) => ({
 const reducer = (state = initalState, action) =>
   produce(state, (draft) => {
     switch (action.type) {
+      case LOAD_POST_REQUEST:
+        draft.loadPostLoading = true;
+        draft.loadPostDone = false;
+        draft.loadPostError = null;
+        break;
+      case LOAD_POST_SUCCESS:
+        draft.loadPostLoading = false;
+        draft.loadPostDone = true;
+        draft.loadPostError = null;
+        draft.mainPosts = action.data.concat(draft.mainPosts);
+        draft.hasMorePost = draft.mainPosts.length < 50;
+        break;
+      case LOAD_POST_FAILURE:
+        draft.loadPostLoading = false;
+        draft.loadPostError = action.error;
+        break;
       case ADD_POST_REQUEST:
         draft.addPostLoading = true;
         draft.addPostDone = false;
@@ -191,7 +177,6 @@ const reducer = (state = initalState, action) =>
           post.Comments.unshift(dummyComments(action.data.content));
           draft.addCommentLoading = false;
           draft.addCommentDone = true;
-          console.log('왜 ?!!');
         }
         break;
       case ADD_COMMENT_FAILURE:
