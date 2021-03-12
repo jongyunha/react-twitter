@@ -1,4 +1,5 @@
 const express = require("express");
+const postRouter = require("./routes/post");
 
 const app = express();
 const port = 3065;
@@ -27,15 +28,7 @@ app.get("/api/posts", (req, res) => {
   ]);
 });
 
-app.post("/api/post", (req, res) => {
-  res.json({ id: 1, content: "hello" });
-});
-
-app.post("/api/post", (req, res) => {});
-
-app.delete("/api/post", (req, res) => {
-  res.json({ id: 1 });
-});
+app.use("/post", postRouter);
 
 app.listen(port, () => {
   console.log(`localhost:${port} 에서 실행중`);
