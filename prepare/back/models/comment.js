@@ -7,6 +7,8 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false,
       },
     },
+    // UserId: 1
+    // PostId: 3
     {
       // user model setting
       charset: "utf8",
@@ -14,6 +16,7 @@ module.exports = (sequelize, DataTypes) => {
     }
   );
   Comment.associate = (db) => {
-    return Comment;
+    db.Comment.belongsTo(db.User);
   };
+  return Comment;
 };

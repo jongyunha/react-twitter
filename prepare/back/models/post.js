@@ -14,6 +14,14 @@ module.exports = (sequelize, DataTypes) => {
     }
   );
   Post.associate = (db) => {
-    return Post;
+    db.Post.belongsTo(db.User);
+    db.Post.belongsToMany(db.Hashtag); // 다대다 관계일때는 belongsToMany
+    db.Post.hasMany(db.Commnet);
+    db.Post.hasMany(db.Image);
+    // 나중에 as 에 따라서 post.getLikers 처럼 게시글 좋아요 누른 사람을 가져오게 됩니다.
+    db.Post.belongsToMany(db.User, { through: "Like", as: "Likers" });
+    // Retweet 을 염두
+    db.Post.belongsTo(db.Post, { as: "Retweet" });
   };
+  return Post;
 };
