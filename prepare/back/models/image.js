@@ -2,7 +2,10 @@ module.exports = (sequelize, DataTypes) => {
   const Image = sequelize.define(
     "Image",
     {
-      src: {},
+      src: {
+        type: DataTypes.STRING(200),
+        allowNull: false,
+      },
     },
     {
       // user model setting
@@ -13,5 +16,5 @@ module.exports = (sequelize, DataTypes) => {
   Image.associate = (db) => {
     db.Image.belongsTo(db.Post);
   };
-  return Comment;
+  return Image;
 };
