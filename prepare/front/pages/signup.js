@@ -1,5 +1,6 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import Head from 'next/head';
+import Router from 'next/router';
 import { Form, Input, Checkbox, Button } from 'antd';
 
 import styled from 'styled-components';
@@ -14,7 +15,18 @@ const ErrorMessage = styled.div`
 
 const Signup = () => {
   const dispatch = useDispatch();
-  const { signUpLoading } = useSelector((state) => state.user);
+  const { signUpLoading, signUpDone, signUpError } = useSelector(
+    (state) => state.user,
+  );
+
+  useEffect(() => {
+    // 회원가입이 완료되면 홈으로 돌아가기
+    if (signUpDone) Router.push('/');
+  }, [signUpDone]);
+
+  useEffect(() => {
+    if (signUpError) alert(signUpError);
+  }, [signUpError]);
 
   const [email, onChangeEmail] = useInput('');
   const [password, onChangePassword] = useInput('');

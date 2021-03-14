@@ -21,8 +21,11 @@ router.post("/", async (req, res, next) => {
       // sagas/user signUpApi -> data 가 req.body 로 받습니다.
       email: req.body.email,
       nickname: req.body.nickname,
-      password: req.body.password,
+      password: hashedPassword,
     });
+    // cors error 해결하는 방법
+    // res.setHeader("Access-Control-Allow-Origin", "http://localhost:3060");
+    // 이렇게 직접 적어 줘도 되지만 보통은 미들웨어를 사용합니다. npm i cors
     res.status(201).send("ok");
   } catch (error) {
     console.error(error);

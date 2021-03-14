@@ -1,4 +1,6 @@
 const express = require("express");
+const cors = require("cors");
+
 const postRouter = require("./routes/post");
 const userRouter = require("./routes/user");
 const db = require("./models");
@@ -12,6 +14,12 @@ db.sequelize
   })
   .catch(console.log("error"));
 
+app.use(
+  cors({
+    // origin 를 true 로 설정 해두면 * 대신 보낸곳의 주소가 자동으로 들어가 편리합니다.
+    origin: true,
+  })
+);
 // req.body 를 사용하려면 아래와 같이 적어줘야합니다.
 // 프론트에서 보낸 데이터를 req.body 안에 넣어주는 역활을 합니다!
 // use 안에 들어가는것들을 middleware 라고 합니다.
