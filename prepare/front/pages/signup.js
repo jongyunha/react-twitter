@@ -2,11 +2,11 @@ import React, { useState, useCallback } from 'react';
 import Head from 'next/head';
 import { Form, Input, Checkbox, Button } from 'antd';
 
+import styled from 'styled-components';
+import { useDispatch, useSelector } from 'react-redux';
 import AppLayout from '../components/AppLayout';
 import useInput from '../hooks/useInput';
-import styled from 'styled-components';
 import { SIGN_UP_REQUEST } from '../reducers/user';
-import { useDispatch, useSelector } from 'react-redux';
 
 const ErrorMessage = styled.div`
   color: red;
@@ -42,7 +42,7 @@ const Signup = () => {
       type: SIGN_UP_REQUEST,
       data: { email, password, nickname },
     });
-  }, [term, password, passwordCheck]);
+  }, [term, password, passwordCheck, nickname]);
 
   const onChangePasswordCheck = useCallback(
     (e) => {

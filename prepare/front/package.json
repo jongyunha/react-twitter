@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "next -p 8082"
+    "dev": "next -p 3060"
   },
   "keywords": [],
   "author": "hajongyun",
