@@ -58,7 +58,7 @@ function* unfollow(action) {
 }
 
 function logInApi(data) {
-  return axios.post('api/login', data);
+  return axios.post('/user/login', data);
 }
 
 function* logIn(action) {
@@ -72,11 +72,11 @@ function* logIn(action) {
     // put 을 실행 하는데, fork 를 하게 되면 비동기 이기때문에 바로 put 이 실행되어 버립니다.!! 참
 
     // 보통이 함수 호출은 logInApi(action.data) 이렇게 하지마 call 이나 fork 를 사용할때는 이렇게 펼쳐줘야 합니다.
-    // const result = yield call(logInApi, action.data);
-    yield delay(1000);
+    const result = yield call(logInApi, action.data);
     yield put({
       type: LOG_IN_SUCCESS,
-      data: action.data,
+      // 서버로 부터 사용자 데이터를 받아옵니다.
+      data: result.data,
     });
   } catch (err) {
     // put 은 dispatch 입니다.
@@ -88,7 +88,7 @@ function* logIn(action) {
 }
 
 function logOutApi() {
-  return axios.post('api/logOut');
+  return axios.post('/user/logOut');
 }
 
 function* logOut() {
@@ -107,7 +107,7 @@ function* logOut() {
 }
 
 function signUpApi(data) {
-  return axios.post('http://localhost:3065/user', data);
+  return axios.post('/user', data);
 }
 
 function* signUp(action) {
