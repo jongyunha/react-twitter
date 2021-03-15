@@ -1,5 +1,9 @@
 const express = require('express');
 const cors = require('cors');
+const session = require('express-session');
+const cookieParser = require('cookie-parser');
+const passport = require('passport');
+const dotenv = require('dotenv');
 
 const postRouter = require('./routes/post');
 const userRouter = require('./routes/user');
@@ -8,6 +12,7 @@ const app = express();
 const port = 3065;
 const passportConfig = require('./passport');
 
+dotenv.config();
 db.sequelize
   .sync()
   .then(() => {
@@ -28,7 +33,17 @@ app.use(
 // middleware 들의 순서를 알맞게 배치하는것도 중요합니다.
 app.use(express.json()); // json 형식으로 보냈을때 req.body 에 추가해줌
 app.use(express.urlencoded({ extended: true })); // form submit 형식으로 보냈을때 req.body 에 추가해줌
-
+// npm i express-session, npm i cookie-parser
+app.use(cookieParser(process.env.COOKIE_SECRET));
+app.use(
+  session({
+    saveUninitialized: false,
+    resave: false,
+    secret: process.env.COOKIE_SECRET,
+  }),
+);
+app.use(passport.initialize());
+app.use(passport.session());
 // app.get -> 가져오다
 // app.post -> 생성하다
 // app.put -> 전체 수정

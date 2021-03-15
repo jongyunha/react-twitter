@@ -21,10 +21,10 @@ router.post('/login', (req, res, next) => {
       if (loginErr) {
         console.error(loginErr);
         return next(loginErr);
-        기;
       }
-      // 사용자 정보를 프론트로 넘겨주
-      return res.json(user);
+      // 사용자 정보를 프론트로 넘겨주기
+      // res.setHeader('Cookie', 'cxlhy')
+      return res.status(200).json(user);
     });
   })(req, res, next);
 });
@@ -56,6 +56,14 @@ router.post('/', async (req, res, next) => {
     console.error(error);
     next(error);
   }
+});
+
+router.post('/user/logoit', (req, res, next) => {
+  // 로그인한 사람의 정보가 들어있습니다.
+  console.log(req.user);
+  req.logout();
+  req.session.destroy();
+  res.send('ok');
 });
 
 module.exports = router;
