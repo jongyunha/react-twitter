@@ -1,13 +1,15 @@
 const express = require('express');
 const bcrypt = require('bcrypt');
+const router = express.Router();
 const passport = require('passport');
+
 // index -> db.User
 const { User, Post } = require('../models');
-const router = express.Router();
+const { isLoggedIn, isNotLoggedIn } = require('./middlewares');
 
 // Post /user/login
 // middleware 확장
-router.post('/login', (req, res, next) => {
+router.post('/login', isNotLoggedIn, (req, res, next) => {
   passport.authenticate('local', (err, user, info) => {
     if (err) {
       console.error(err);
@@ -54,7 +56,7 @@ router.post('/login', (req, res, next) => {
 });
 
 // Post /user
-router.post('/', async (req, res, next) => {
+router.post('/', isNotLoggedIn, async (req, res, next) => {
   try {
     const exUser = await User.findOne({
       where: {
@@ -82,7 +84,7 @@ router.post('/', async (req, res, next) => {
   }
 });
 
-router.post('/logout', (req, res, next) => {
+router.post('/logout', isLoggedIn, (req, res, next) => {
   // 로그인한 사람의 정보가 들어있습니다.
   console.log(req.user);
   req.logout();

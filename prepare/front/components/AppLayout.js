@@ -36,9 +36,7 @@ const AppLayout = ({ children }) => {
         <Menu.Item>
           <Link href="/">Home</Link>
         </Menu.Item>
-        <Menu.Item>
-          <Link href="/profile">프로필</Link>
-        </Menu.Item>
+        <Menu.Item>{me && <Link href="/profile">프로필</Link>}</Menu.Item>
         <Menu.Item>
           <SearchInput enterButton />
         </Menu.Item>
