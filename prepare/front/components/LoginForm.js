@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useEffect } from 'react';
 import { Form, Input, Button } from 'antd';
 import Link from 'next/link';
 import styled from 'styled-components';
@@ -14,13 +14,16 @@ const ButtonWrapper = styled.div`
 const FormWrapper = styled(Form)`
   padding: 10px;
 `;
-
 const LoginForm = () => {
-  const { logInLoading, me } = useSelector((state) => state.user);
+  const { logInLoading, logInError } = useSelector((state) => state.user);
   const dispatch = useDispatch();
   // Form 에서는 반복되는 부분이 많아서 custom hook 을 쓰면 좋아요
   const [email, onChangeEmail] = useInput('');
   const [password, onChangePassword] = useInput('');
+
+  useEffect(() => {
+    if (logInError) alert(logInError);
+  }, [logInError]);
 
   const onSubmitForm = useCallback(() => {
     // reducers 폴더에서 user.js 의 action create 참조

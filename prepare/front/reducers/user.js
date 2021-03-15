@@ -128,17 +128,17 @@ const reducer = (state = initalState, action) =>
         break;
       case LOG_IN_REQUEST:
         draft.logInLoading = true;
-        draft.loginDone = false;
-        draft.loginError = null;
+        draft.logInDone = false;
+        draft.logInError = null;
         break;
       case LOG_IN_SUCCESS:
         draft.logInLoading = false;
-        draft.loginDone = true;
+        draft.logInDone = true;
         draft.me = action.data;
         break;
       case LOG_IN_FAILURE:
         draft.logInLoading = false;
-        draft.loginError = action.error;
+        draft.logInError = action.error;
         break;
       case LOG_OUT_REQUEST:
         draft.logOutLoading = true;
@@ -147,12 +147,12 @@ const reducer = (state = initalState, action) =>
         break;
       case LOG_OUT_SUCCESS:
         draft.logOutLoading = false;
-        draft.logOutDone = true;
+        draft.logOutDone = false;
         draft.me = null;
         break;
       case LOG_OUT_FAILURE:
         draft.logOutLoading = false;
-        draft.loginError = action.error;
+        draft.logOutError = action.error;
         break;
       case SIGN_UP_REQUEST:
         draft.signUpLoading = true;

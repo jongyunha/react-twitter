@@ -2,7 +2,7 @@ const express = require('express');
 const bcrypt = require('bcrypt');
 const passport = require('passport');
 // index -> db.User
-const { User } = require('../models');
+const { User, Post } = require('../models');
 const router = express.Router();
 
 // Post /user/login
@@ -22,9 +22,33 @@ router.post('/login', (req, res, next) => {
         console.error(loginErr);
         return next(loginErr);
       }
+      const fullUserWithoutPassword = await User.findOne({
+        where: { id: user.id },
+        // attributes 를 통해서 원하는 정보만 받을 수 있습니다.
+        // attributes: ['id', 'email', 'nickname'],
+        // 위와 동일한 문법으로 비밀번호를 제외한 것만 가져오겠다.
+        attributes: {
+          exclude: ['password'],
+        },
+        // include 를 해주게 되면 user.id 에 해당되는 post , follow, follower 를 가져옵니다.
+        include: [
+          {
+            // hashMany 라서 model: Post 가 복수형이 되어 me.Posts 가 됩니다.
+            model: Post,
+          },
+          {
+            model: User,
+            as: 'Followings',
+          },
+          {
+            model: User,
+            as: 'Followers',
+          },
+        ],
+      });
       // 사용자 정보를 프론트로 넘겨주기
       // res.setHeader('Cookie', 'cxlhy')
-      return res.status(200).json(user);
+      return res.status(200).json(fullUserWithoutPassword);
     });
   })(req, res, next);
 });
@@ -58,7 +82,7 @@ router.post('/', async (req, res, next) => {
   }
 });
 
-router.post('/user/logoit', (req, res, next) => {
+router.post('/logout', (req, res, next) => {
   // 로그인한 사람의 정보가 들어있습니다.
   console.log(req.user);
   req.logout();

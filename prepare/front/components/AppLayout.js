@@ -2,13 +2,12 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import Link from 'next/link';
 import { Menu, Input, Row, Col } from 'antd';
-import styled from 'styled-components';
+import styled, { createGlobalStyle } from 'styled-components';
 // npm i react-redux
 import { useSelector } from 'react-redux';
-import { createGlobalStyle } from 'styled-components';
 
-import UserProfile from '../components/UserProfile';
-import LoginForm from '../components/LoginForm';
+import UserProfile from './UserProfile';
+import LoginForm from './LoginForm';
 
 const Global = createGlobalStyle`
 	.ant-row {
@@ -43,9 +42,7 @@ const AppLayout = ({ children }) => {
         <Menu.Item>
           <SearchInput enterButton />
         </Menu.Item>
-        <Menu.Item>
-          <Link href="/signup">회원가입</Link>
-        </Menu.Item>
+        <Menu.Item>{!me && <Link href="/signup">회원가입</Link>}</Menu.Item>
       </Menu>
       <Row gutter={8}>
         <Col xs={24} md={6}>

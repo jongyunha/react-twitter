@@ -44,7 +44,6 @@ function unfollowApi(data) {
 
 function* unfollow(action) {
   try {
-    yield delay(1000);
     yield put({
       type: UNFOLLOW_SUCCESS,
       data: action.data,
@@ -88,13 +87,12 @@ function* logIn(action) {
 }
 
 function logOutApi() {
-  return axios.post('/user/logOut');
+  return axios.post('/user/logout');
 }
 
 function* logOut() {
   try {
-    // const result = yield call(logOutApi);
-    yield delay(1000);
+    yield call(logOutApi);
     yield put({
       type: LOG_OUT_SUCCESS,
     });
