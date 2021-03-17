@@ -133,7 +133,7 @@ const reducer = (state = initalState, action) =>
         // 새로운 게시글이 제일 상단에 뜨게하기 위해서
         // draft.mainPosts = [dummyPost(action.data), ...state.mainPosts];
         // immer 도입후
-        draft.mainPosts.unshift(dummyPost(action.data));
+        draft.mainPosts.unshift(action.data);
         break;
       case ADD_POST_FAILURE:
         draft.addPostLoading = false;
@@ -173,8 +173,8 @@ const reducer = (state = initalState, action) =>
         // };
         // 댓글을 달았을대 어떤 게시물에 댓글을 달았는지 게시물의 index 값을 찾아내기 위해서
         {
-          const post = draft.mainPosts.find((v) => v.id === action.data.postId);
-          post.Comments.unshift(dummyComments(action.data.content));
+          const post = draft.mainPosts.find((v) => v.id === action.data.PostId);
+          post.Comments.unshift(action.data);
           draft.addCommentLoading = false;
           draft.addCommentDone = true;
         }
