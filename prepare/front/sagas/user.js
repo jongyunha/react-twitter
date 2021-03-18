@@ -17,6 +17,9 @@ import {
   FOLLOW_SUCCESS,
   UNFOLLOW_SUCCESS,
   UNFOLLOW_FAILURE,
+  LOAD_MY_INFO_REQUEST,
+  LOAD_MY_INFO_FAILURE,
+  LOAD_MY_INFO_SUCCESS,
 } from '../reducers/user';
 
 function followApi(data) {
@@ -122,6 +125,25 @@ function* signUp(action) {
   }
 }
 
+function loadMyInfoApi() {
+  return axios.get('/user');
+}
+
+function* loadMyInfo() {
+  try {
+    const result = yield call(loadMyInfoApi);
+    yield put({
+      type: LOAD_MY_INFO_SUCCESS,
+      data: result.data,
+    });
+  } catch (err) {
+    yield put({
+      type: LOAD_MY_INFO_FAILURE,
+      error: err.response.data,
+    });
+  }
+}
+
 function* watchLogin() {
   // 만약 while 로 감싸지 않았다면 next 가 한번 호출될때 로그인 한번실행되고 끝이 납니다.
   // 그래서 무한 or event listener 의 역활을 하기 위해서 while (true) 로 래핑합니다.
@@ -160,6 +182,10 @@ function* watchUnFollow() {
   yield takeLatest(UNFOLLOW_REQUEST, unfollow);
 }
 
+function* watchLoadMyInfo() {
+  yield takeLatest(LOAD_MY_INFO_REQUEST, loadMyInfo);
+}
+
 export default function* userSage() {
   yield all([
     fork(watchLogin),
@@ -167,5 +193,6 @@ export default function* userSage() {
     fork(watchSignUp),
     fork(watchFollow),
     fork(watchUnFollow),
+    fork(watchLoadMyInfo),
   ]);
 }

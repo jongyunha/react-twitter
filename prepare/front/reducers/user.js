@@ -2,6 +2,9 @@ import produce from 'immer';
 import { ADD_POST_TO_ME, REMOVE_POST_OF_ME } from './post';
 
 export const initalState = {
+  loadMyInfoLoading: false, // 내정보 불러오기 시도중
+  loadMyInfoDone: false,
+  loadMyInfoError: false,
   logInLoading: false, // 로그인 시도중
   logInDone: false,
   logInError: false,
@@ -24,6 +27,10 @@ export const initalState = {
   signUpData: {},
   loginData: {},
 };
+
+export const LOAD_MY_INFO_REQUEST = 'LOAD_MY_INFO_REQUEST';
+export const LOAD_MY_INFO_SUCCESS = 'LOAD_MY_INFO_SUCCESS';
+export const LOAD_MY_INFO_FAILURE = 'LOAD_MY_INFO_FAILURE';
 
 export const LOG_IN_REQUEST = 'LOG_IN_REQUEST';
 export const LOG_IN_SUCCESS = 'LOG_IN_SUCCESS';
@@ -48,23 +55,6 @@ export const FOLLOW_FAILURE = 'FOLLOW_FAILURE';
 export const UNFOLLOW_REQUEST = 'UNFOLLOW_REQUEST';
 export const UNFOLLOW_SUCCESS = 'UNFOLLOW_SUCCESS';
 export const UNFOLLOW_FAILURE = 'UNFOLLOW_FAILURE';
-
-const dummyUser = (data) => ({
-  ...data,
-  nickname: '하종윤',
-  id: 1,
-  Posts: [{ id: 1 }],
-  Followings: [
-    { nickname: '최태훈' },
-    { nickname: '황수철' },
-    { nickname: '김기량' },
-  ],
-  Followers: [
-    { nickname: '최태훈' },
-    { nickname: '황수철' },
-    { nickname: '김기량' },
-  ],
-});
 
 // 이것의 redux-thunk 전부 입니다. redux-thunk 를 사용하는 이유는 한번에 여러번의 dispatch 를 하기 위해서
 // export const loginAction = (data) => {
@@ -96,6 +86,20 @@ export const logoutRequestAction = () => ({
 const reducer = (state = initalState, action) =>
   produce(state, (draft) => {
     switch (action.type) {
+      case LOAD_MY_INFO_REQUEST:
+        draft.loadMyInfoLoading = true;
+        draft.loadMyInfoDone = false;
+        draft.loadMyInfoError = null;
+        break;
+      case LOAD_MY_INFO_SUCCESS:
+        draft.loadMyInfoLoading = false;
+        draft.me = action.data;
+        draft.loadMyInfoDone = true;
+        break;
+      case LOAD_MY_INFO_FAILURE:
+        draft.loadMyInfoLoading = false;
+        draft.loadMyInfoError = action.error;
+        break;
       case FOLLOW_REQUEST:
         draft.followLoading = true;
         draft.followDone = false;
@@ -105,6 +109,10 @@ const reducer = (state = initalState, action) =>
         draft.followLoading = false;
         draft.me.Followings.push({ id: action.data });
         draft.followDone = true;
+        break;
+      case FOLLOW_FAILURE:
+        draft.followLoading = false;
+        draft.followError = action.error;
         break;
       case UNFOLLOW_FAILURE:
         draft.unfollowLoading = false;
@@ -121,10 +129,6 @@ const reducer = (state = initalState, action) =>
           (v) => v.id !== action.data,
         );
         draft.unfollowDone = true;
-        break;
-      case FOLLOW_FAILURE:
-        draft.followLoading = false;
-        draft.followError = action.error;
         break;
       case LOG_IN_REQUEST:
         draft.logInLoading = true;

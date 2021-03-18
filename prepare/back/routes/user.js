@@ -7,6 +7,44 @@ const passport = require('passport');
 const { User, Post } = require('../models');
 const { isLoggedIn, isNotLoggedIn } = require('./middlewares');
 
+router.get('/', isLoggedIn, async (req, res, next) => {
+  try {
+    // 로그인을 하면 request.user 에 유저 정보가 담겨져 있는데
+    // 유저 정보가 있으면 그 유저정보를 json 형태로 보내주고
+    // user 정보가 없다면 빈 객체를 보냅니다.
+    if (req.user) {
+      const fullUserWithoutPassword = await User.findOne({
+        where: { id: req.user.id },
+        attributes: {
+          exclude: ['password'],
+        },
+        include: [
+          {
+            model: Post,
+            attributes: ['id'],
+          },
+          {
+            model: User,
+            as: 'Followings',
+            attributes: ['id'],
+          },
+          {
+            model: User,
+            as: 'Followers',
+            attributes: ['id'],
+          },
+        ],
+      });
+      res.status(200).json(fullUserWithoutPassword);
+    } else {
+      res.status(200).json(null);
+    }
+  } catch (error) {
+    console.error(error);
+    next(error);
+  }
+});
+
 // Post /user/login
 // middleware 확장
 router.post('/login', isNotLoggedIn, (req, res, next) => {
