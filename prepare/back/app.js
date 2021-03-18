@@ -4,8 +4,10 @@ const session = require('express-session');
 const cookieParser = require('cookie-parser');
 const passport = require('passport');
 const dotenv = require('dotenv');
+const morgan = require('morgan');
 
 const postRouter = require('./routes/post');
+const postsRouter = require('./routes/posts');
 const userRouter = require('./routes/user');
 const db = require('./models');
 const app = express();
@@ -21,6 +23,7 @@ db.sequelize
   .catch(console.log('error'));
 passportConfig();
 
+app.use(morgan('dev'));
 app.use(
   cors({
     // origin 를 true 로 설정 해두면 * 대신 보낸곳의 주소가 자동으로 들어가 편리합니다.
@@ -54,23 +57,8 @@ app.use(passport.session());
 // app.options -> 찔러보기 (나 요청 보낼수 있어?)
 // app.head -> 헤더만 가져오기 (헤더 / 바디)
 
-app.get('/', (req, res) => {
-  res.send('hello express');
-});
-
-app.get('/api', (req, res) => {
-  res.send('hello api');
-});
-
-app.get('/api/posts', (req, res) => {
-  res.json([
-    { id: 1, content: 'hello' },
-    { id: 2, content: 'hello2' },
-    { id: 3, content: 'hello3' },
-  ]);
-});
-
 app.use('/post', postRouter);
+app.use('/posts', postsRouter);
 app.use('/user', userRouter);
 
 app.listen(port, () => {

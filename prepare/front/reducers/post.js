@@ -22,30 +22,6 @@ export const initalState = {
   removePostError: null,
 };
 
-export const generateDummyPost = (number) =>
-  Array(number)
-    .fill()
-    .map(() => ({
-      id: shortId.generate(),
-      User: {
-        id: shortId.generate(),
-        nickname: faker.name.findName(),
-      },
-      content: faker.lorem.paragraph(),
-      Images: [{ src: faker.image.image() }],
-      Comments: [
-        {
-          User: {
-            id: shortId.generate(),
-            nickname: faker.name.findName(),
-          },
-          content: faker.lorem.sentence(),
-        },
-      ],
-    }));
-
-// initalState.mainPosts = initalState.mainPosts.concat(generateDummyPost(10));
-
 export const LOAD_POST_REQUEST = 'LOAD_POST_REQUEST';
 export const LOAD_POST_SUCCESS = 'LOAD_POST_SUCCESS';
 export const LOAD_POST_FAILURE = 'LOAD_POST_FAILURE';
@@ -79,17 +55,6 @@ export const addComment = (data) => ({
 // npm i shortid
 // 더미데이터를 매번 만들기 힘들기 때문에 더미데이터를 자동으로 만들어주는 라이브러리
 // npm i faker
-
-const dummyPost = (data) => ({
-  id: data.id,
-  content: data.content,
-  User: {
-    id: 1,
-    nickname: '하종윤',
-  },
-  Images: [],
-  Comments: [],
-});
 
 const dummyComments = (data) => ({
   id: shortId.generate(),

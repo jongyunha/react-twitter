@@ -7,7 +7,7 @@ const passport = require('passport');
 const { User, Post } = require('../models');
 const { isLoggedIn, isNotLoggedIn } = require('./middlewares');
 
-router.get('/', isLoggedIn, async (req, res, next) => {
+router.get('/', async (req, res, next) => {
   try {
     // 로그인을 하면 request.user 에 유저 정보가 담겨져 있는데
     // 유저 정보가 있으면 그 유저정보를 json 형태로 보내주고
@@ -37,6 +37,7 @@ router.get('/', isLoggedIn, async (req, res, next) => {
       });
       res.status(200).json(fullUserWithoutPassword);
     } else {
+      console.log('로그인안됨용');
       res.status(200).json(null);
     }
   } catch (error) {
