@@ -24,7 +24,9 @@ passportConfig();
 app.use(
   cors({
     // origin 를 true 로 설정 해두면 * 대신 보낸곳의 주소가 자동으로 들어가 편리합니다.
-    origin: true,
+    origin: 'http://localhost:3060',
+    // 프론트 쪽으로 쿠키를 같이 넘겨주고싶을때
+    credentials: true,
   }),
 );
 // req.body 를 사용하려면 아래와 같이 적어줘야합니다.

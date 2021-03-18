@@ -6,6 +6,7 @@ import postSaga from './post';
 import userSage from './user';
 
 axios.defaults.baseURL = 'http://localhost:3065';
+axios.defaults.withCredentials = true;
 
 export default function* rootSaga() {
   // 비동기 액션을 하나씩 넣어줍니다.
