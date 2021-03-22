@@ -23,36 +23,43 @@ import {
   CHANGE_NICKNAME_REQUEST,
   CHANGE_NICKNAME_SUCCESS,
   CHANGE_NICKNAME_FAILURE,
+  LOAD_FOLLOWERS_REQUEST,
+  LOAD_FOLLOWINGS_REQUEST,
+  LOAD_FOLLOWERS_SUCCESS,
+  LOAD_FOLLOWERS_FAILURE,
+  LOAD_FOLLOWINGS_SUCCESS,
+  LOAD_FOLLOWINGS_FAILURE,
 } from '../reducers/user';
 
 function followApi(data) {
-  return axios.post('api/follow', data);
+  return axios.patch(`/user/${data}/follow`);
 }
 
 function* follow(action) {
   try {
-    yield delay(1000);
+    const result = yield call(followApi, action.data);
     yield put({
       type: FOLLOW_SUCCESS,
-      data: action.data,
+      data: result.data,
     });
   } catch (error) {
     yield put({
       type: FOLLOW_FAILURE,
-      data: error,
+      data: error.response.data,
     });
   }
 }
 
 function unfollowApi(data) {
-  return axios.post('api/unfollow', data);
+  return axios.delete(`/user/${data}/follow`);
 }
 
 function* unfollow(action) {
   try {
+    const result = yield call(unfollowApi, action.data);
     yield put({
       type: UNFOLLOW_SUCCESS,
-      data: action.data,
+      data: result.data,
     });
   } catch (error) {
     yield put({
@@ -167,6 +174,46 @@ function* changeMyNickname(action) {
   }
 }
 
+function loadFollowersApi(data) {
+  return axios.get('/user/followers', data);
+}
+
+function* loadFollowers(action) {
+  try {
+    const result = yield call(loadFollowersApi, action.data);
+    yield put({
+      type: LOAD_FOLLOWERS_SUCCESS,
+      data: result.data,
+    });
+  } catch (err) {
+    console.error(err);
+    yield put({
+      type: LOAD_FOLLOWERS_FAILURE,
+      data: err.response.data,
+    });
+  }
+}
+
+function loadFollowingsApi(data) {
+  return axios.get('/user/followings', data);
+}
+
+function* loadFollowings(action) {
+  try {
+    const result = yield call(loadFollowingsApi, action.data);
+    yield put({
+      type: LOAD_FOLLOWINGS_SUCCESS,
+      data: result.data,
+    });
+  } catch (err) {
+    console.error(err);
+    yield put({
+      type: LOAD_FOLLOWINGS_FAILURE,
+      data: err.response.data,
+    });
+  }
+}
+
 function* watchLogin() {
   // 만약 while 로 감싸지 않았다면 next 가 한번 호출될때 로그인 한번실행되고 끝이 납니다.
   // 그래서 무한 or event listener 의 역활을 하기 위해서 while (true) 로 래핑합니다.
@@ -213,6 +260,14 @@ function* watchChangeMyNickname() {
   yield takeLatest(CHANGE_NICKNAME_REQUEST, changeMyNickname);
 }
 
+function* watchLoadFollowers() {
+  yield takeLatest(LOAD_FOLLOWERS_REQUEST, loadFollowers);
+}
+
+function* watchLoadFollowings() {
+  yield takeLatest(LOAD_FOLLOWINGS_REQUEST, loadFollowings);
+}
+
 export default function* userSage() {
   yield all([
     fork(watchLogin),
@@ -222,5 +277,7 @@ export default function* userSage() {
     fork(watchUnFollow),
     fork(watchLoadMyInfo),
     fork(watchChangeMyNickname),
+    fork(watchLoadFollowers),
+    fork(watchLoadFollowings),
   ]);
 }
