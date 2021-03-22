@@ -20,18 +20,23 @@ router.post('/', isLoggedIn, async (req, res, next) => {
         {
           model: Comment,
           include: {
-            model: User,
+            model: User, // 댓글 작성자
             attributes: ['id', 'nickname'],
           },
         },
         {
-          model: User,
+          model: User, // 게시글 작성자
           attributes: ['id', 'nickname'],
+        },
+        {
+          model: User, // 좋아요 누른 사람 구분 해주기 위해서 as 를 가져와서 사용
+          as: 'Likers',
+          attributes: ['id'],
         },
       ],
     });
 
-    res.status(201).json(post);
+    res.status(201).json(fullPost);
   } catch (error) {
     console.error(error);
     next(error);
@@ -65,9 +70,36 @@ router.post('/:postId/comment', isLoggedIn, async (req, res, next) => {
   }
 });
 
-// DELETE /post
-router.delete('/', (req, res) => {
-  res.json({ id: 1 });
+// patch /post/1/like
+router.patch('/:postId/like', isLoggedIn, async (req, res, next) => {
+  try {
+    const post = await Post.findOne({
+      where: { id: req.params.postId },
+    });
+    if (!post) return res.status(403).send('존재하지 않는 게시물 입니다.');
+    // models post.js 를 참고
+    // db 를 조작할땐 await 를 붙여주기 비동기
+    await post.addLikers(req.user.id);
+    res.json({ PostId: post.id, UserId: req.user.id });
+  } catch (error) {
+    console.log(error);
+    next(error);
+  }
+});
+
+// Delete /post/1/like
+router.delete('/:postId/like', isLoggedIn, async (req, res, next) => {
+  try {
+    const post = await Post.findOne({
+      where: { id: req.params.postId },
+    });
+    if (!post) return res.status(403).send('존재하지 않는 게시물 입니다.');
+    await post.removeLikers(req.user.id);
+    res.json({ PostId: post.id, UserId: req.user.id });
+  } catch (error) {
+    console.log(error);
+    next(error);
+  }
 });
 
 module.exports = router;

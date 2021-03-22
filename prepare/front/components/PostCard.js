@@ -12,7 +12,11 @@ import {
 
 import { useDispatch, useSelector } from 'react-redux';
 import Avatar from 'antd/lib/avatar/avatar';
-import { REMOVE_POST_REQUEST } from '../reducers/post';
+import {
+  REMOVE_POST_REQUEST,
+  LIKE_POST_REQUEST,
+  UNLIKE_POST_REQUEST,
+} from '../reducers/post';
 
 import PostImages from './PostImages';
 import CommentForm from './CommentForm';
@@ -23,12 +27,23 @@ const PostCard = ({ post }) => {
   const dispatch = useDispatch();
   const { me } = useSelector((state) => state.user);
   const { removePostLoading } = useSelector((state) => state.post);
-  const [liked, setLiked] = useState(false);
   const [commentFormOpened, setCommentFormOpened] = useState(false);
 
-  const onToggleLike = useCallback(() => {
-    setLiked((prev) => !prev);
-  }, [liked]);
+  const onLike = useCallback(() => {
+    dispatch({
+      // 사용자 id 는 req.user 에 들어 있습니다!
+      type: LIKE_POST_REQUEST,
+      data: post.id,
+    });
+  }, []);
+
+  const onUnLike = useCallback(() => {
+    dispatch({
+      type: UNLIKE_POST_REQUEST,
+      data: post.id,
+    });
+  }, []);
+
   const onToggleComment = useCallback(() => {
     setCommentFormOpened((prev) => !prev);
   }, [commentFormOpened]);
@@ -40,6 +55,7 @@ const PostCard = ({ post }) => {
   }, []);
   // const id = me ? me.id : undefined;
   const id = me?.id;
+  const liked = post.Likers.find((v) => v.id === id);
   // {/* 배열안에 JSX를 넣을땐 항상 key 값을 줘야합니다.*/}
   return (
     <div style={{ marginBottom: 10 }}>
@@ -51,10 +67,10 @@ const PostCard = ({ post }) => {
             <HeartTwoTone
               twoToneColor="#eb2f96"
               key="heart"
-              onClick={onToggleLike}
+              onClick={onUnLike}
             />
           ) : (
-            <HeartOutlined key="heart" onClick={onToggleLike} />
+            <HeartOutlined key="heart" onClick={onLike} />
           ),
           <MessageOutlined key="comment" onClick={onToggleComment} />,
           <Popover
@@ -88,15 +104,9 @@ const PostCard = ({ post }) => {
           title={post.User.nickname}
           description={<PostCardContent postData={post.content} />}
         />
-        {/* <Image />
-			<Content />
-			<Buttons></Buttons> */}
       </Card>
       {commentFormOpened && (
         <div>
-          {/* 댓글을 다는 Form 에 post를 넘겨주는이유는
-						댓글은 게시글에 속해 있기 때문에 어떤 게시글에 댓글을 남겨야할지 구분하기 위해서
-					*/}
           <CommentForm post={post} />
           <List
             header={`${post.Comments.length} 댓글`}
@@ -128,6 +138,7 @@ PostCard.propTypes = {
     Comments: PropTypes.arrayOf(PropTypes.object),
     imagePaths: PropTypes.arrayOf(PropTypes.object),
     postAdded: PropTypes.bool,
+    Likers: PropTypes.arrayOf(PropTypes.object),
   }).isRequired,
 };
 

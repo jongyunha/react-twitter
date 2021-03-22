@@ -14,6 +14,12 @@ import {
   REMOVE_POST_FAILURE,
   LOAD_POST_REQUEST,
   LOAD_POST_SUCCESS,
+  LIKE_POST_REQUEST,
+  LIKE_POST_FAILURE,
+  LIKE_POST_SUCCESS,
+  UNLIKE_POST_REQUEST,
+  UNLIKE_POST_SUCCESS,
+  UNLIKE_POST_FAILURE,
 } from '../reducers/post';
 import { LOG_OUT_SUCCESS } from '../reducers/user';
 
@@ -108,6 +114,47 @@ function* addComment(action) {
   }
 }
 
+function likePostApi(data) {
+  // 게시글의 일부분을 수정
+  // 뒤에 인자로 data를 넣어줘도 되지만 url 주소에 data 값이 있기 때문에 굳이 넣어주지 않았습니다.
+  return axios.patch(`/post/${data}/like`);
+}
+
+function* likePost(action) {
+  try {
+    const result = yield call(likePostApi, action.data);
+    yield put({
+      type: LIKE_POST_SUCCESS,
+      data: result.data, // {PostId: post.id, UserId: req.user.id}
+    });
+  } catch (err) {
+    yield put({
+      type: LIKE_POST_FAILURE,
+      error: err.response.data,
+    });
+  }
+}
+
+function unLikePostApi(data) {
+  // 몇번 게시물의 좋아요 삭제 ? 라는 뜻 으로 프론트 와 백이 서로 의사소통만 잘하면 됨!
+  return axios.delete(`/post/${data}/like`);
+}
+
+function* unLikePost(action) {
+  try {
+    const result = yield call(unLikePostApi, action.data);
+    yield put({
+      type: UNLIKE_POST_SUCCESS,
+      data: result.data,
+    });
+  } catch (err) {
+    yield put({
+      type: UNLIKE_POST_FAILURE,
+      error: err.response.data,
+    });
+  }
+}
+
 function* watchloadPost() {
   yield takeLatest(LOAD_POST_REQUEST, loadPost);
 }
@@ -124,11 +171,20 @@ function* watchRemovePost() {
   yield takeLatest(REMOVE_POST_REQUEST, removePost);
 }
 
+function* watchLikePost() {
+  yield takeLatest(LIKE_POST_REQUEST, likePost);
+}
+
+function* watchUnLikePost() {
+  yield takeLatest(UNLIKE_POST_REQUEST, unLikePost);
+}
 export default function* postSaga() {
   yield all([
     fork(watchAddPost),
     fork(watchAddComment),
     fork(watchRemovePost),
     fork(watchloadPost),
+    fork(watchLikePost),
+    fork(watchUnLikePost),
   ]);
 }

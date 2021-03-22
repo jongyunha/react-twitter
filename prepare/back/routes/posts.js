@@ -34,6 +34,11 @@ router.get('/', async (req, res, next) => {
             },
           ],
         },
+        {
+          model: User,
+          as: 'Likers',
+          attributes: ['id'],
+        },
       ],
 
       // offset: 0, // 1 ~ 10 오프셋 방식은 게시글을 추가 할때 문제가 있고 실무에서 잘 쓰이지 않습니다.
