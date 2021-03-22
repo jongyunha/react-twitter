@@ -25,12 +25,14 @@ const FollowButton = ({ post }) => {
   }, [isFollowing]);
   return (
     <>
-      <Button
-        onClick={onClickButton}
-        loading={followLoading || unfollowLoading}
-      >
-        {isFollowing ? '언팔로우' : '팔로우'}
-      </Button>
+      {post.UserId !== me.id && (
+        <Button
+          onClick={onClickButton}
+          loading={followLoading || unfollowLoading}
+        >
+          {isFollowing ? '언팔로우' : '팔로우'}
+        </Button>
+      )}
     </>
   );
 };

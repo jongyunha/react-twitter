@@ -82,7 +82,7 @@ router.patch('/:postId/like', isLoggedIn, async (req, res, next) => {
     await post.addLikers(req.user.id);
     res.json({ PostId: post.id, UserId: req.user.id });
   } catch (error) {
-    console.log(error);
+    console.error(error);
     next(error);
   }
 });
@@ -97,7 +97,21 @@ router.delete('/:postId/like', isLoggedIn, async (req, res, next) => {
     await post.removeLikers(req.user.id);
     res.json({ PostId: post.id, UserId: req.user.id });
   } catch (error) {
-    console.log(error);
+    console.error(error);
+    next(error);
+  }
+});
+
+router.delete('/:postId', isLoggedIn, async (req, res, next) => {
+  try {
+    // sequelize 문법의 파괴하다 제거하다 destroy
+    const postId = parseInt(req.params.postId);
+    await Post.destroy({
+      where: { id: postId, UserId: req.user.id },
+    });
+    res.json({ PostId: postId });
+  } catch (error) {
+    console.error(error);
     next(error);
   }
 });

@@ -1,5 +1,5 @@
 import produce from 'immer';
-import { ADD_POST_TO_ME, REMOVE_POST_OF_ME } from './post';
+import { ADD_POST_TO_ME } from './post';
 
 export const initalState = {
   loadMyInfoLoading: false, // 내정보 불러오기 시도중
@@ -55,6 +55,8 @@ export const FOLLOW_FAILURE = 'FOLLOW_FAILURE';
 export const UNFOLLOW_REQUEST = 'UNFOLLOW_REQUEST';
 export const UNFOLLOW_SUCCESS = 'UNFOLLOW_SUCCESS';
 export const UNFOLLOW_FAILURE = 'UNFOLLOW_FAILURE';
+
+export const REMOVE_POST_OF_ME = 'REMOVE_POST_OF_ME';
 
 // 이것의 redux-thunk 전부 입니다. redux-thunk 를 사용하는 이유는 한번에 여러번의 dispatch 를 하기 위해서
 // export const loginAction = (data) => {
@@ -179,11 +181,13 @@ const reducer = (state = initalState, action) =>
         break;
       case CHANGE_NICKNAME_SUCCESS:
         draft.ChangeNickNameLoading = false;
+        draft.me.nickname = action.data.nickname;
         draft.ChangeNickNameDone = true;
         break;
       case CHANGE_NICKNAME_FAILURE:
         draft.ChangeNickNameLoading = false;
-        draft.ChangeNickNameError = action.error;
+        draft.ChangeNickNameDone = false;
+        draft.ChangeNickNameError = action.response.error;
         break;
       case ADD_POST_TO_ME:
         draft.me.Posts.unshift({ id: action.data });
@@ -196,7 +200,9 @@ const reducer = (state = initalState, action) =>
       //   },
       // };
       case REMOVE_POST_OF_ME:
-        draft.me.Posts = draft.me.Posts.filter((v) => v.id !== action.data);
+        draft.me.Posts = draft.me.Posts.filter(
+          (v) => v.id !== action.data.PostId,
+        );
         break;
       default:
         break;

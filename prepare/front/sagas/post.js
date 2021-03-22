@@ -9,7 +9,6 @@ import {
   ADD_COMMENT_SUCCESS,
   ADD_POST_TO_ME,
   REMOVE_POST_REQUEST,
-  REMOVE_POST_OF_ME,
   REMOVE_POST_SUCCESS,
   REMOVE_POST_FAILURE,
   LOAD_POST_REQUEST,
@@ -21,7 +20,7 @@ import {
   UNLIKE_POST_SUCCESS,
   UNLIKE_POST_FAILURE,
 } from '../reducers/post';
-import { LOG_OUT_SUCCESS } from '../reducers/user';
+import { REMOVE_POST_OF_ME } from '../reducers/user';
 
 function loadPostApi(data) {
   return axios.get('/posts', data);
@@ -67,20 +66,20 @@ function* addPost(action) {
 }
 
 function removePostApi(data) {
-  return axios.delete('post', data);
+  // delete 는 데이터를 넣을수 없어요
+  return axios.delete(`/post/${data}`);
 }
 
 function* removePost(action) {
   try {
-    // const result = yield call(addPostApi, action.data);
-    yield delay(1000);
+    const result = yield call(removePostApi, action.data);
     yield put({
       type: REMOVE_POST_SUCCESS,
-      data: action.data,
+      data: result.data,
     });
     yield put({
       type: REMOVE_POST_OF_ME,
-      data: action.data,
+      data: result.data,
     });
   } catch (err) {
     yield put({

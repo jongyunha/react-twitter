@@ -20,6 +20,9 @@ import {
   LOAD_MY_INFO_REQUEST,
   LOAD_MY_INFO_FAILURE,
   LOAD_MY_INFO_SUCCESS,
+  CHANGE_NICKNAME_REQUEST,
+  CHANGE_NICKNAME_SUCCESS,
+  CHANGE_NICKNAME_FAILURE,
 } from '../reducers/user';
 
 function followApi(data) {
@@ -144,6 +147,26 @@ function* loadMyInfo() {
   }
 }
 
+function changeMyNicknameApi(data) {
+  return axios.patch('/user/nickname', { nickname: data });
+}
+
+function* changeMyNickname(action) {
+  try {
+    const result = yield call(changeMyNicknameApi, action.data);
+    yield put({
+      type: CHANGE_NICKNAME_SUCCESS,
+      data: result.data,
+    });
+  } catch (err) {
+    console.error(err);
+    yield put({
+      type: CHANGE_NICKNAME_FAILURE,
+      data: err.response.data,
+    });
+  }
+}
+
 function* watchLogin() {
   // 만약 while 로 감싸지 않았다면 next 가 한번 호출될때 로그인 한번실행되고 끝이 납니다.
   // 그래서 무한 or event listener 의 역활을 하기 위해서 while (true) 로 래핑합니다.
@@ -186,6 +209,10 @@ function* watchLoadMyInfo() {
   yield takeLatest(LOAD_MY_INFO_REQUEST, loadMyInfo);
 }
 
+function* watchChangeMyNickname() {
+  yield takeLatest(CHANGE_NICKNAME_REQUEST, changeMyNickname);
+}
+
 export default function* userSage() {
   yield all([
     fork(watchLogin),
@@ -194,5 +221,6 @@ export default function* userSage() {
     fork(watchFollow),
     fork(watchUnFollow),
     fork(watchLoadMyInfo),
+    fork(watchChangeMyNickname),
   ]);
 }

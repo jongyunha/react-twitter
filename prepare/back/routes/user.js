@@ -37,7 +37,6 @@ router.get('/', async (req, res, next) => {
       });
       res.status(200).json(fullUserWithoutPassword);
     } else {
-      console.log('로그인안됨용');
       res.status(200).json(null);
     }
   } catch (error) {
@@ -129,6 +128,25 @@ router.post('/logout', isLoggedIn, (req, res, next) => {
   req.logout();
   req.session.destroy();
   res.send('ok');
+});
+
+router.patch('/nickname', isLoggedIn, async (req, res, next) => {
+  try {
+    await User.update(
+      {
+        // 프론트에서 제공한 닉네임
+        // 첫번째 가 수정하고 싶은값
+        nickname: req.body.nickname,
+      },
+      {
+        where: { id: req.user.id },
+      },
+    );
+    res.status(200).json({ nickname: req.body.nickname });
+  } catch (error) {
+    console.error(error);
+    next(error);
+  }
 });
 
 module.exports = router;

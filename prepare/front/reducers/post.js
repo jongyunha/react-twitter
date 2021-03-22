@@ -52,8 +52,6 @@ export const REMOVE_POST_SUCCESS = 'REMOVE_POST_SUCCESS';
 export const REMOVE_POST_FAILURE = 'REMOVE_POST_FAILURE';
 
 export const ADD_POST_TO_ME = 'ADD_POST_TO_ME';
-export const REMOVE_POST_OF_ME = 'REMOVE_POST_OF_ME';
-
 export const addPost = (data) => ({
   type: ADD_POST_REQUEST,
   data,
@@ -162,10 +160,13 @@ const reducer = (state = initalState, action) =>
       case REMOVE_POST_SUCCESS:
         draft.removePostLoading = false;
         draft.removePostDone = true;
-        draft.mainPosts = draft.mainPosts.filter((v) => v.id !== action.data);
+        draft.mainPosts = draft.mainPosts.filter(
+          (v) => v.id !== action.data.PostId,
+        );
         break;
       case REMOVE_POST_FAILURE:
         draft.removePostLoading = false;
+        draft.removePostDone = false;
         draft.removePostError = action.error;
         break;
       case ADD_COMMENT_REQUEST:
