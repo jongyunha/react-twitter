@@ -2,6 +2,9 @@ import produce from 'immer';
 import { ADD_POST_TO_ME } from './post';
 
 export const initalState = {
+  removeFollowerLoading: false, // 내 팔로워 제거하기
+  removeFollowerDone: false,
+  removeFollowerError: false,
   loadMyInfoLoading: false, // 내정보 불러오기 시도중
   loadMyInfoDone: false,
   loadMyInfoError: false,
@@ -33,6 +36,10 @@ export const initalState = {
   signUpData: {},
   loginData: {},
 };
+
+export const REMOVE_FOLLOWER_REQUEST = 'REMOVE_FOLLOWER_REQUEST';
+export const REMOVE_FOLLOWER_SUCCESS = 'REMOVE_FOLLOWER_SUCCESS';
+export const REMOVE_FOLLOWER_FAILURE = 'REMOVE_FOLLOWER_FAILURE';
 
 export const LOAD_FOLLOWERS_REQUEST = 'LOAD_FOLLOWERS_REQUEST';
 export const LOAD_FOLLOWERS_SUCCESS = 'LOAD_FOLLOWERS_SUCCESS';
@@ -102,6 +109,22 @@ export const logoutRequestAction = () => ({
 const reducer = (state = initalState, action) =>
   produce(state, (draft) => {
     switch (action.type) {
+      case REMOVE_FOLLOWER_REQUEST:
+        draft.removeFollowerLoading = true;
+        draft.removeFollowerDone = false;
+        draft.removeFollowerError = null;
+        break;
+      case REMOVE_FOLLOWER_SUCCESS:
+        draft.removeFollowerLoading = false;
+        draft.me.Followers = draft.me.Followers.filter(
+          (v) => v.id !== action.data.UserId,
+        );
+        draft.removeFollowerDone = true;
+        break;
+      case REMOVE_FOLLOWER_FAILURE:
+        draft.removeFollowerLoading = false;
+        draft.removeFollowerError = action.error;
+        break;
       case LOAD_FOLLOWERS_REQUEST:
         draft.loadFollowersLoading = true;
         draft.loadFollowersDone = false;

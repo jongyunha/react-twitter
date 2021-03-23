@@ -19,20 +19,18 @@ const Profile = () => {
   useEffect(() => {
     if (!(me && me.id)) {
       Router.push('/');
+    } else {
+      dispatch({
+        type: LOAD_FOLLOWERS_REQUEST,
+      });
+      dispatch({
+        type: LOAD_FOLLOWINGS_REQUEST,
+      });
     }
   }, [me && me.id]);
   if (!me) {
     return null;
   }
-
-  useEffect(() => {
-    dispatch({
-      type: LOAD_FOLLOWERS_REQUEST,
-    });
-    dispatch({
-      type: LOAD_FOLLOWINGS_REQUEST,
-    });
-  }, [me && me.id]);
 
   return (
     <>
@@ -42,8 +40,8 @@ const Profile = () => {
       <AppLayout>
         {/* 큼직 큼직하게 미리 구상 해놓기  */}
         <NicknameEditForm />
-        <FollowList header="팔로워 목록" data={me.Followings} />
-        <FollowList header="팔로잉 목록" data={me.Followers} />
+        <FollowList header="팔로잉" data={me.Followings} />
+        <FollowList header="팔로워" data={me.Followers} />
       </AppLayout>
     </>
   );

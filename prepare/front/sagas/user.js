@@ -29,6 +29,9 @@ import {
   LOAD_FOLLOWERS_FAILURE,
   LOAD_FOLLOWINGS_SUCCESS,
   LOAD_FOLLOWINGS_FAILURE,
+  REMOVE_FOLLOWER_REQUEST,
+  REMOVE_FOLLOWER_SUCCESS,
+  REMOVE_FOLLOWER_FAILURE,
 } from '../reducers/user';
 
 function followApi(data) {
@@ -181,6 +184,7 @@ function loadFollowersApi(data) {
 function* loadFollowers(action) {
   try {
     const result = yield call(loadFollowersApi, action.data);
+    console.log(result.data);
     yield put({
       type: LOAD_FOLLOWERS_SUCCESS,
       data: result.data,
@@ -201,6 +205,7 @@ function loadFollowingsApi(data) {
 function* loadFollowings(action) {
   try {
     const result = yield call(loadFollowingsApi, action.data);
+    console.log(result.data);
     yield put({
       type: LOAD_FOLLOWINGS_SUCCESS,
       data: result.data,
@@ -209,6 +214,26 @@ function* loadFollowings(action) {
     console.error(err);
     yield put({
       type: LOAD_FOLLOWINGS_FAILURE,
+      data: err.response.data,
+    });
+  }
+}
+
+function removeFollowerApi(data) {
+  return axios.delete(`/user/follower/${data}`);
+}
+
+function* removeFollower(action) {
+  try {
+    const result = yield call(removeFollowerApi, action.data);
+    yield put({
+      type: REMOVE_FOLLOWER_SUCCESS,
+      data: result.data,
+    });
+  } catch (err) {
+    console.error(err);
+    yield put({
+      type: REMOVE_FOLLOWER_FAILURE,
       data: err.response.data,
     });
   }
@@ -268,6 +293,10 @@ function* watchLoadFollowings() {
   yield takeLatest(LOAD_FOLLOWINGS_REQUEST, loadFollowings);
 }
 
+function* watchRemoveFollower() {
+  yield takeLatest(REMOVE_FOLLOWER_REQUEST, removeFollower);
+}
+
 export default function* userSage() {
   yield all([
     fork(watchLogin),
@@ -279,5 +308,6 @@ export default function* userSage() {
     fork(watchChangeMyNickname),
     fork(watchLoadFollowers),
     fork(watchLoadFollowings),
+    fork(watchRemoveFollower),
   ]);
 }

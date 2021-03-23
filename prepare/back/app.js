@@ -27,7 +27,7 @@ app.use(morgan('dev'));
 app.use(
   cors({
     // origin 를 true 로 설정 해두면 * 대신 보낸곳의 주소가 자동으로 들어가 편리합니다.
-    origin: 'http://localhost:3060',
+    origin: true,
     // 프론트 쪽으로 쿠키를 같이 넘겨주고싶을때
     credentials: true,
   }),
