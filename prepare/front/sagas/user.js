@@ -33,6 +33,7 @@ import {
   REMOVE_FOLLOWER_SUCCESS,
   REMOVE_FOLLOWER_FAILURE,
 } from '../reducers/user';
+import { UPLOAD_IMAGES_REQUEST } from '../reducers/post';
 
 function followApi(data) {
   return axios.patch(`/user/${data}/follow`);
